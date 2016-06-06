@@ -252,7 +252,7 @@ class BootstrapTable extends Component {
     return (
       <div className='react-bs-table-container' style={ this.props.containerStyle }>
         { toolBar }
-        <div className='react-bs-table' ref='table' style={ { ...style, ...this.props.tableStyle } }
+        <div ref='table' style={ { ...style, ...this.props.tableStyle } }
             onMouseEnter={ this.handleMouseEnter }
             onMouseLeave={ this.handleMouseLeave }>
           <TableHeader

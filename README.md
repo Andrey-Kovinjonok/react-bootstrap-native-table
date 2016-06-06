@@ -1,64 +1,20 @@
-# react-bootstrap-table
+# react-bootstrap-native-table
 
-[![Join the chat at https://gitter.im/AllenFang/react-bootstrap-table](https://badges.gitter.im/AllenFang/react-bootstrap-table.svg)](https://gitter.im/AllenFang/react-bootstrap-table?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+It is a fork of react-bootstrap-native-table
+Author AllenFang
 
-[![NPM version][npm-badge]][npm] [![Build Status][travis-ci-image]][travis-ci-url]
+That 'native' version is using reac-bootstrap.
 
-[![Dependency Status][deps-badge]][deps]
-[![devDependency Status][dev-deps-badge]][dev-deps]
-[![peerDependency Status][peer-deps-badge]][peer-deps]
-
-It's a [react.js](http://facebook.github.io/react/) table for bootstrap, named reactbsTable. It's a configurable, functional table component and make you build a Bootstrap Table more efficiency and easy in your React application, However ```react-bootstrap-table``` support these features:
-
-- striped, borderless, condensed table
-- column align, hidden, width, sort
-- scrolling table
-- cell format
-- pagination
-- row selection
-- column filter with multi type
-- cell edit with multi type editor
-- insert & delete Row
-- row and column style customization
-- global search
-- export to CSV file
-- rich function hooks
-- large columns table
-
-Explore more example on [examples](https://github.com/AllenFang/react-bootstrap-table/tree/master/examples/js) folder</br>
-See more about [react-bootstrap-table](http://allenfang.github.io/react-bootstrap-table/index.html).</br>
-Check [this](http://allenfang.github.io/react-bootstrap-table/advance.html) for more advance usage for ```react-bootstrap-table```. Feel free to ask more examples.</br>
-Check the <a href='https://github.com/AllenFang/react-bootstrap-table/blob/master/CHANGELOG.md'>CHANGELOG</a> for more detail release notes.
-
-## Notes
-***```v2.0.0``` has been released, the main patches are fixing the unalign or wrong size column on different browsers and improving the table structure. Please check [this](https://github.com/AllenFang/react-bootstrap-table/issues/331) for more detail explanation.<br/>***
-
-***```v3.0.0``` is under planning, check [Milestone to v3.0.0](https://github.com/AllenFang/react-bootstrap-table/issues/497).<br/>***
-
-## Development
-```react-bootstrap-table``` dependencies on react 0.14.x and Bootstrap 3 written by ES6 and use gulp and browserify for building and bundling.
-
-You can use the following commands to prepare development
-```bash
-$ git clone https://github.com/AllenFang/react-bootstrap-table.git
-$ cd react-bootstrap-table
-$ npm install
-```
-Use gulp to build the react-bootstrap-table
-```bash
-$ gulp dev  #for development
-$ gulp example-server #see all examples, go to localhost:3004
-$ gulp prod #for production
-```
+https://docs.npmjs.com/getting-started/publishing-npm-packages
 
 ## Usage
 ### a.Install
 ```bash
-npm install react-bootstrap-table --save
+npm install react-bootstrap-native-table --save
 ```
 
 ### b.Import Module
-To use react-bootstrap-table in your react app, you should import it first.
+To use react-bootstrap-native-table in your react app, you should import it first.
 You can do this in two ways:
 
 ##### With a module bundler
@@ -67,17 +23,17 @@ You can include source maps on your build system to debug on development. Don't 
 
 ```js
 // in ECMAScript 6
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-native-table';
 // or in ECMAScript 5
-var ReactBSTable = require('react-bootstrap-table');  
+var ReactBSTable = require('react-bootstrap-native-table');  
 var BootstrapTable = ReactBSTable.BootstrapTable;
 var TableHeaderColumn = ReactBSTable.TableHeaderColumn;
 ```
 ##### Browser global(window object)
-In the `dist` folder you have a UMD bundle with source maps (`react-bootstrap-table.js`) as well as a minified version (`react-bootstrap-table.min.js`).
+In the `dist` folder you have a UMD bundle with source maps (`react-bootstrap-native-table.js`) as well as a minified version (`react-bootstrap-native-table.min.js`).
 
 ```html
-<script src="path/to/react-bootstrap-table/dist/react-bootstrap-table.min.js" />
+<script src="path/to/react-bootstrap-native-table/dist/react-bootstrap-native-table.min.js" />
 <script>
   var ReactBsTable = window.BootstrapTable;
   //...
@@ -87,24 +43,24 @@ In the `dist` folder you have a UMD bundle with source maps (`react-bootstrap-ta
 The UMD build is also available on [npmcdn](https://npmcdn.com):
 
 ```html
-// source maps: https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table.js.map
-<script src="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table.js"></script>
+// source maps: https://npmcdn.com/react-bootstrap-native-table/dist/react-bootstrap-native-table.js.map
+<script src="https://npmcdn.com/react-bootstrap-native-table/dist/react-bootstrap-native-table.js"></script>
 // or use the min version
-<script src="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table.min.js"></script>
+<script src="https://npmcdn.com/react-bootstrap-native-table/dist/react-bootstrap-native-table.min.js"></script>
 ```
 
 ### c.Import CSS
 Finally, you need to import the css file to your app, there are two css file you can choose.</br>
-```react-bootstrap-table-all.min.css``` include toastr.</br>```react-bootstrap-table.min.css``` doesn't include toastr.</br>
-**Notes: react-bootstrap-table use toastr to alarm some message to user.**
+```react-bootstrap-native-table-all.min.css``` include toastr.</br>```react-bootstrap-native-table.min.css``` doesn't include toastr.</br>
+**Notes: react-bootstrap-native-table use toastr to alarm some message to user.**
 ```html
-<link rel="stylesheet" href="./css/react-bootstrap-table-all.min.css">
+<link rel="stylesheet" href="./css/react-bootstrap-native-table-all.min.css">
 ```
 The CSS files you can find in the css folder.
 
 ### Quick Demo
 ```js
-// products will be presented by react-bootstrap-table
+// products will be presented by react-bootstrap-native-table
 var products = [{
       id: 1,
       name: "Item name 1",
@@ -128,16 +84,16 @@ React.render(
 	document.getElementById("app")
 );
 ```
-### More react-bootstrap-table examples
-The example source codes is in the [examples](https://github.com/AllenFang/react-bootstrap-table/tree/master/examples) folder. Run  the following commands for a live demo.</br>
+### More react-bootstrap-native-table examples
+The example source codes is in the [examples](https://github.com/AllenFang/react-bootstrap-native-table/tree/master/examples) folder. Run  the following commands for a live demo.</br>
 ```bash
-$ git clone https://github.com/AllenFang/react-bootstrap-table.git
-$ cd react-bootstrap-table
+$ git clone https://github.com/AllenFang/react-bootstrap-native-table.git
+$ cd react-bootstrap-native-table
 $ npm install
 $ gulp example-server #after start, open browser and go to http://localhost:3004
 ```
 
-### [Documentation](http://allenfang.github.io/react-bootstrap-table/docs.html)
+### [Documentation](http://allenfang.github.io/react-bootstrap-native-table/docs.html)
 
 ### Thanks
 **[luqin](https://github.com/luqin)**  
@@ -159,17 +115,17 @@ Bugs report and enhance the cell formatting.
 **[Reggino](https://github.com/Reggino)**  
 Implement the TableDataSet component.  
 
-[npm-badge]: http://badge.fury.io/js/react-bootstrap-table.svg
-[npm]: http://badge.fury.io/js/react-bootstrap-table
+[npm-badge]: http://badge.fury.io/js/react-bootstrap-native-table.svg
+[npm]: http://badge.fury.io/js/react-bootstrap-native-table
 
-[deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-table.svg
-[deps]: https://david-dm.org/AllenFang/react-bootstrap-table
+[deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-native-table.svg
+[deps]: https://david-dm.org/AllenFang/react-bootstrap-native-table
 
-[dev-deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-table/dev-status.svg
-[dev-deps]: https://david-dm.org/AllenFang/react-bootstrap-table#info=devDependencies
+[dev-deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-native-table/dev-status.svg
+[dev-deps]: https://david-dm.org/AllenFang/react-bootstrap-native-table#info=devDependencies
 
-[peer-deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-table/peer-status.svg
-[peer-deps]: https://david-dm.org/AllenFang/react-bootstrap-table#info=peerDependencies
+[peer-deps-badge]: https://david-dm.org/AllenFang/react-bootstrap-native-table/peer-status.svg
+[peer-deps]: https://david-dm.org/AllenFang/react-bootstrap-native-table#info=peerDependencies
 
-[travis-ci-image]: https://travis-ci.org/AllenFang/react-bootstrap-table.svg
-[travis-ci-url]: https://travis-ci.org/AllenFang/react-bootstrap-table
+[travis-ci-image]: https://travis-ci.org/AllenFang/react-bootstrap-native-table.svg
+[travis-ci-url]: https://travis-ci.org/AllenFang/react-bootstrap-native-table
