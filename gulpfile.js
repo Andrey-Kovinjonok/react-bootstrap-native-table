@@ -116,7 +116,7 @@ function browserifing(main, bundleName, dest) {
 
   if (demo)
     b = b.require(require.resolve('./src/index.js'), {
-      expose: 'react-bootstrap-table'
+      expose: 'react-bootstrap-native-table'
     });
 
   if (watching) {
