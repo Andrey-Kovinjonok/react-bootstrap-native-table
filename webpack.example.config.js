@@ -22,7 +22,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx'],
     alias: {
-      'react-bootstrap-native-table': path.resolve(__dirname, './src')
+      'react-bootstrap-table': path.resolve(__dirname, './src')
     }
   },
   module: {

@@ -27,7 +27,7 @@ class TableHeader extends Component {
     let i = 0;
 
     return (
-      <thead style={ this.props.style }>
+      <thead ref='container' style={ this.props.style }>
         <tr ref='header'>
           { selectRowHeaderCol }
           {
