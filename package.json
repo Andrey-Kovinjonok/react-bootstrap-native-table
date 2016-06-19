@@ -1,11 +1,11 @@
 {
   "name": "react-bootstrap-native-table",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "It's a react table for bootstrap",
   "main": "./lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Andrey-Kovinjonok/react-bootstrap-table/tarball/master"
+    "url": "https://github.com/Andrey-Kovinjonok/react-bootstrap-native-table.git"
   },
   "scripts": {
     "lint": "eslint src",
@@ -66,6 +66,9 @@
   },
   "dependencies": {
     "classnames": "^2.1.2",
+    "react": "^15.1.0",
+    "react-bootstrap": "^0.27.3",
+    "react-dom": "^15.1.0",
     "react-toastr": "^2.3.1"
   },
   "peerDependencies": {

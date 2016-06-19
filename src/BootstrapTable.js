@@ -12,6 +12,9 @@ import Util from './util';
 import exportCSV from './csv_export_util';
 import { Filter } from './Filter';
 
+import * as RBS from 'react-bootstrap';
+const { Table } = RBS;
+
 class BootstrapTable extends Component {
 
   constructor(props) {
@@ -195,12 +198,12 @@ class BootstrapTable extends Component {
   componentDidMount() {
     this._adjustTable();
     window.addEventListener('resize', this._adjustTable);
-    this.refs.body.refs.container.addEventListener('scroll', this._scrollHeader);
+    this.refs.body.refs.tbody.addEventListener('scroll', this._scrollHeader);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._adjustTable);
-    this.refs.body.refs.container.removeEventListener('scroll', this._scrollHeader);
+    this.refs.body.refs.tbody.removeEventListener('scroll', this._scrollHeader);
     if (this.filter) {
       this.filter.removeAllListeners('onFilterChange');
     }
@@ -248,13 +251,16 @@ class BootstrapTable extends Component {
     const tableFilter = this.renderTableFilter(columns);
     const isSelectAll = this.isSelectAll();
     let sortIndicator = this.props.options.sortIndicator;
+
+    const tableClasses = 'table table-hover' || this.props.trClassName;
+
     if (typeof this.props.options.sortIndicator === 'undefined') sortIndicator = true;
     return (
       <div className='react-bs-table-container' style={ this.props.containerStyle }>
         { toolBar }
-        <div ref='table' style={ { ...style, ...this.props.tableStyle } }
-            onMouseEnter={ this.handleMouseEnter }
-            onMouseLeave={ this.handleMouseLeave }>
+        <Table className={ tableClasses } ref='table' style={ { ...style, ...this.props.tableStyle } }
+          onMouseEnter={ this.handleMouseEnter }
+          onMouseLeave={ this.handleMouseLeave }>
           <TableHeader
             ref='header'
             tableHeaderClass={ this.props.tableHeaderClass }
@@ -291,7 +297,7 @@ class BootstrapTable extends Component {
             onRowMouseOut={ this.handleRowMouseOut }
             onSelectRow={ this.handleSelectRow }
             noDataText={ this.props.options.noDataText } />
-        </div>
+        </Table>
         { tableFilter }
         { pagination }
       </div>
@@ -827,17 +833,17 @@ class BootstrapTable extends Component {
   }
 
   _scrollHeader = (e) => {
-    this.refs.header.refs.container.scrollLeft = e.currentTarget.scrollLeft;
+    this.refs.header.refs.tbody.scrollLeft = e.currentTarget.scrollLeft;
   }
 
   _adjustTable = () => {
-    this._adjustHeaderWidth();
+    // this._adjustHeaderWidth();
     this._adjustHeight();
   }
 
   _adjustHeaderWidth = () => {
     const header = this.refs.header.refs.header;
-    const headerContainer = this.refs.header.refs.container;
+    const headerContainer = this.refs.header.refs.tbody;
     const tbody = this.refs.body.refs.tbody;
     const firstRow = tbody.childNodes[0];
     const isScroll = headerContainer.offsetWidth !== tbody.parentNode.offsetWidth;
@@ -869,8 +875,8 @@ class BootstrapTable extends Component {
 
   _adjustHeight = () => {
     if (this.props.height.indexOf('%') === -1) {
-      this.refs.body.refs.container.style.height =
-        parseFloat(this.props.height, 10) - this.refs.header.refs.container.offsetHeight + 'px';
+      this.refs.body.refs.tbody.style.height =
+        parseFloat(this.props.height, 10) - this.refs.header.refs.tbody.offsetHeight + 'px';
     }
   }
 

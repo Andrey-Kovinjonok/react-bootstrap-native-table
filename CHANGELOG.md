@@ -7,6 +7,7 @@
 ### Features
 * rebase from origin branch 2.3.6
 * cleanup className for table's block (was removed className='react-bs-table')
+
 <a name="v0.0.6"></a>
 <a name="v0.0.5"></a>
 <a name="v0.0.4"></a>

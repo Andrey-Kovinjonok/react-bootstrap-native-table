@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import Const from './Const';
-import classSet from 'classnames';
 import SelectRowHeaderColumn from './SelectRowHeaderColumn';
 
 class Checkbox extends Component {
@@ -23,32 +22,23 @@ class Checkbox extends Component {
 class TableHeader extends Component {
 
   render() {
-    const containerClasses = classSet('react-bs-container-header', 'table-header-wrapper');
-    const tableClasses = classSet('table', 'table-hover', {
-      'table-bordered': this.props.bordered,
-      'table-condensed': this.props.condensed
-    }, this.props.tableHeaderClass);
     let selectRowHeaderCol = null;
     if (!this.props.hideSelectColumn) selectRowHeaderCol = this.renderSelectRowHeader();
     let i = 0;
     return (
-      <div ref='container' className={ containerClasses } style={ this.props.style }>
-        <table className={ tableClasses }>
-          <thead>
-            <tr ref='header'>
-              { selectRowHeaderCol }
-              {
-                React.Children.map(this.props.children, (elm) => {
-                  const { sortIndicator, sortName, sortOrder, onSort } = this.props;
-                  const { dataField, dataSort } = elm.props;
-                  const sort = (dataSort && dataField === sortName) ? sortOrder : undefined;
-                  return React.cloneElement(elm, { key: i++, onSort, sort, sortIndicator });
-                })
-              }
-            </tr>
-          </thead>
-        </table>
-      </div>
+      <thead ref='container' style={ this.props.style }>
+        <tr ref='header'>
+          { selectRowHeaderCol }
+          {
+            React.Children.map(this.props.children, (elm) => {
+              const { sortIndicator, sortName, sortOrder, onSort } = this.props;
+              const { dataField, dataSort } = elm.props;
+              const sort = (dataSort && dataField === sortName) ? sortOrder : undefined;
+              return React.cloneElement(elm, { key: i++, onSort, sort, sortIndicator });
+            })
+          }
+        </tr>
+      </thead>
     );
   }
 

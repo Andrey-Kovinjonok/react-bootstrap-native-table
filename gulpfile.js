@@ -42,12 +42,12 @@ gulp.task('prod', ['umdBuild'], function() {
     .pipe(babel())
     .pipe(gulp.dest('./lib'));
   // build the css
-  gulp.src('./css/react-bootstrap-table.css')
-    .pipe(concatCss("./react-bootstrap-table.min.css"))
+  gulp.src('./css/react-bootstrap-native-table.css')
+    .pipe(concatCss("./react-bootstrap-native-table.min.css"))
     .pipe(cssmin())
     .pipe(gulp.dest('./css'));
-  gulp.src(['./css/react-bootstrap-table.css', './css/toastr.css'])
-    .pipe(concatCss('./react-bootstrap-table-all.min.css'))
+  gulp.src(['./css/react-bootstrap-native-table.css', './css/toastr.css'])
+    .pipe(concatCss('./react-bootstrap-native-table-all.min.css'))
     .pipe(cssmin())
     .pipe(gulp.dest('./css'));
 });
@@ -116,7 +116,7 @@ function browserifing(main, bundleName, dest) {
 
   if (demo)
     b = b.require(require.resolve('./src/index.js'), {
-      expose: 'react-bootstrap-table'
+      expose: 'react-bootstrap-native-table'
     });
 
   if (watching) {

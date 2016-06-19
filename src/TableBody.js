@@ -136,14 +136,10 @@ class TableBody extends Component {
     this.editing = false;
 
     return (
-      <div ref='container' className='react-bs-container-body' style={ this.props.style }>
-        <table className={ tableClasses }>
-          { tableHeader }
-          <tbody ref='tbody'>
-            { tableRows }
-          </tbody>
-        </table>
-      </div>
+      <tbody ref='tbody' className={ tableClasses } style={ this.props.style }>
+        { tableHeader }
+        { tableRows }
+      </tbody>
     );
   }
 
@@ -217,7 +213,7 @@ class TableBody extends Component {
     if (!this.props.selectRow.clickToSelect ||
       !this.props.selectRow.clickToSelectAndEditCell) {
       this.handleSelectRow(
-        e.currentTarget.parentElement.parentElement.rowIndex + 1,
+        e.currentTarget.parentElement.parentElement.rowIndex,
         e.currentTarget.checked,
         e);
     }

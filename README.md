@@ -7,6 +7,10 @@ That 'native' version is using reac-bootstrap.
 
 https://docs.npmjs.com/getting-started/publishing-npm-packages
 
+
+git pull upstream --rebase master
+
+
 ## Usage
 ### a.Install
 ```bash

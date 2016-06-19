@@ -115,7 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _TableHeader2 = _interopRequireDefault(_TableHeader);
 
-	var _TableBody = __webpack_require__(8);
+	var _TableBody = __webpack_require__(7);
 
 	var _TableBody2 = _interopRequireDefault(_TableBody);
 
@@ -240,15 +240,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.handleSelectAllRow = function (e) {
 	      var isSelected = e.currentTarget.checked;
+	      var keyField = _this.store.getKeyField();
+	      var _props$selectRow = _this.props.selectRow;
+	      var onSelectAll = _props$selectRow.onSelectAll;
+	      var unselectable = _props$selectRow.unselectable;
+
 	      var selectedRowKeys = [];
 	      var result = true;
-	      if (_this.props.selectRow.onSelectAll) {
-	        result = _this.props.selectRow.onSelectAll(isSelected, isSelected ? _this.store.get() : _this.store.getRowByKey(_this.state.selectedRowKeys));
+	      var rows = _this.store.get();
+
+	      if (isSelected && unselectable && unselectable.length > 0) {
+	        rows = rows.filter(function (r) {
+	          return unselectable.indexOf(r[keyField]) === -1;
+	        });
+	      }
+
+	      if (onSelectAll) {
+	        result = _this.props.selectRow.onSelectAll(isSelected, isSelected ? rows : _this.store.getRowByKey(_this.state.selectedRowKeys));
 	      }
 
 	      if (typeof result == 'undefined' || result !== false) {
 	        if (isSelected) {
-	          selectedRowKeys = Array.isArray(result) ? result : _this.store.getAllRowkey();
+	          selectedRowKeys = Array.isArray(result) ? result : rows.map(function (r) {
+	            return r[keyField];
+	          });
 	        }
 
 	        _this.store.setSelectedRowKey(selectedRowKeys);
@@ -466,7 +481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    this._adjustTable = function () {
-	      _this._adjustHeaderWidth();
+	      // this._adjustHeaderWidth();
 	      _this._adjustHeight();
 	    };
 
@@ -528,10 +543,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var copy = this.props.selectRow.selected.slice();
 	      this.store.setSelectedRowKey(copy);
 	    }
+	    var currPage = _Const2['default'].PAGE_START_INDEX;
+	    if (typeof this.props.options.page !== 'undefined') {
+	      currPage = this.props.options.page;
+	    } else if (typeof this.props.options.pageStartIndex !== 'undefined') {
+	      currPage = this.props.options.pageStartIndex;
+	    }
 
 	    this.state = {
 	      data: this.getTableData(),
-	      currPage: this.props.options.page || this.props.options.pageStartIndex || _Const2['default'].PAGE_START_INDEX,
+	      currPage: currPage,
 	      sizePerPage: this.props.options.sizePerPage || _Const2['default'].SIZE_PER_PAGE_LIST[0],
 	      selectedRowKeys: this.store.getSelectedRowKeys()
 	    };
@@ -646,11 +667,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.store.setData(nextProps.data.slice());
 
-	      var page = undefined;
-	      if (options.page != null) {
+	      // from #481
+	      var page = this.state.currPage;
+	      if (this.props.options.page !== options.page) {
 	        page = options.page;
-	      } else {
-	        page = this.state.currPage;
+	      }
+	      // from #481
+	      var sizePerPage = this.state.sizePerPage;
+	      if (this.props.options.sizePerPage !== options.sizePerPage) {
+	        sizePerPage = options.sizePerPage;
 	      }
 
 	      if (this.isRemoteDataSource()) {
@@ -659,10 +684,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          currPage: page
 	        });
 	      } else {
-	        var sizePerPage = options.sizePerPage || this.state.sizePerPage;
-
 	        // #125
-	        if (!options.page && page >= Math.ceil(nextProps.data.length / sizePerPage)) {
+	        if (!options.page && page > Math.ceil(nextProps.data.length / sizePerPage)) {
 	          page = 1;
 	        }
 	        var sortInfo = this.store.getSortInfo();
@@ -751,6 +774,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var tableFilter = this.renderTableFilter(columns);
 	      var isSelectAll = this.isSelectAll();
 	      var sortIndicator = this.props.options.sortIndicator;
+
+	      var tableClasses = 'table table-hover' || this.props.trClassName;
+
 	      if (typeof this.props.options.sortIndicator === 'undefined') sortIndicator = true;
 	      return _react2['default'].createElement(
 	        'div',
@@ -758,7 +784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        toolBar,
 	        _react2['default'].createElement(
 	          Table,
-	          { className: 'react-bs-table', ref: 'table', style: _extends({}, style, this.props.tableStyle),
+	          { className: tableClasses, ref: 'table', style: _extends({}, style, this.props.tableStyle),
 	            onMouseEnter: this.handleMouseEnter,
 	            onMouseLeave: this.handleMouseLeave },
 	          _react2['default'].createElement(
@@ -883,6 +909,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getCurrentPage',
 	    value: function getCurrentPage() {
 	      return this.state.currPage;
+	    }
+	  }, {
+	    key: 'getTableDataIgnorePaging',
+	    value: function getTableDataIgnorePaging() {
+	      return this.store.getCurrentDisplayData();
 	    }
 	  }, {
 	    key: 'deleteRow',
@@ -1094,7 +1125,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    clickToSelect: _react.PropTypes.bool,
 	    hideSelectColumn: _react.PropTypes.bool,
 	    clickToSelectAndEditCell: _react.PropTypes.bool,
-	    showOnlySelected: _react.PropTypes.bool
+	    showOnlySelected: _react.PropTypes.bool,
+	    unselectable: _react.PropTypes.array
 	  }),
 	  cellEdit: _react.PropTypes.shape({
 	    mode: _react.PropTypes.string,
@@ -1179,7 +1211,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    clickToSelect: false,
 	    hideSelectColumn: false,
 	    clickToSelectAndEditCell: false,
-	    showOnlySelected: false
+	    showOnlySelected: false,
+	    unselectable: []
 	  },
 	  cellEdit: {
 	    mode: _Const2['default'].CELL_EDIT_NONE,
@@ -1334,11 +1367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Const2 = _interopRequireDefault(_Const);
 
-	var _classnames = __webpack_require__(6);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _SelectRowHeaderColumn = __webpack_require__(7);
+	var _SelectRowHeaderColumn = __webpack_require__(6);
 
 	var _SelectRowHeaderColumn2 = _interopRequireDefault(_SelectRowHeaderColumn);
 
@@ -1393,17 +1422,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function render() {
 	      var _this = this;
 
-	      // const containerClasses = classSet('react-bs-container-header', 'table-header-wrapper');
-	      var tableClasses = (0, _classnames2['default'])('table', 'table-hover', {
-	        'table-bordered': this.props.bordered,
-	        'table-condensed': this.props.condensed
-	      }, this.props.tableHeaderClass);
 	      var selectRowHeaderCol = null;
 	      if (!this.props.hideSelectColumn) selectRowHeaderCol = this.renderSelectRowHeader();
 	      var i = 0;
 	      return _react2['default'].createElement(
 	        'thead',
-	        { ref: 'container', className: tableClasses, style: this.props.style },
+	        { ref: 'container', style: this.props.style },
 	        _react2['default'].createElement(
 	          'tr',
 	          { ref: 'header' },
@@ -1475,60 +1499,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -1563,7 +1533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function render() {
 	      return _react2['default'].createElement(
 	        'th',
-	        { style: { textAlign: 'center' } },
+	        { style: { textAlign: 'center', width: '20px' } },
 	        this.props.children
 	      );
 	    }
@@ -1579,7 +1549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1606,7 +1576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Const2 = _interopRequireDefault(_Const);
 
-	var _TableRow = __webpack_require__(9);
+	var _TableRow = __webpack_require__(8);
 
 	var _TableRow2 = _interopRequireDefault(_TableRow);
 
@@ -1618,7 +1588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _TableEditColumn2 = _interopRequireDefault(_TableEditColumn);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -1677,7 +1647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.handleSelectRowColumChange = function (e) {
 	      if (!_this.props.selectRow.clickToSelect || !_this.props.selectRow.clickToSelectAndEditCell) {
-	        _this.handleSelectRow(e.currentTarget.parentElement.parentElement.rowIndex + 1, e.currentTarget.checked, e);
+	        _this.handleSelectRow(e.currentTarget.parentElement.parentElement.rowIndex, e.currentTarget.checked, e);
 	      }
 	    };
 
@@ -1725,8 +1695,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'table-condensed': this.props.condensed
 	      }, this.props.tableBodyClass);
 
+	      var unselectable = this.props.selectRow.unselectable || [];
 	      var isSelectRowDefined = this._isSelectRowDefined();
 	      var tableHeader = this.renderTableHeader(isSelectRowDefined);
+	      var inputType = this.props.selectRow.mode === _Const2['default'].ROW_SELECT_SINGLE ? 'radio' : 'checkbox';
 
 	      var tableRows = this.props.data.map(function (data, r) {
 	        var tableColumns = this.props.columns.map(function (column, i) {
@@ -1770,10 +1742,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                columnChild = _react2['default'].createElement('div', { dangerouslySetInnerHTML: { __html: formattedValue } });
 	              } else {
 	                columnChild = formattedValue;
-	                columnTitle = column.columnTitle ? formattedValue.toString() : null;
+	                columnTitle = column.columnTitle && formattedValue ? formattedValue.toString() : null;
 	              }
 	            } else {
-	              columnTitle = column.columnTitle ? fieldValue.toString() : null;
+	              columnTitle = column.columnTitle && fieldValue ? fieldValue.toString() : null;
 	            }
 	            return _react2['default'].createElement(
 	              _TableColumn2['default'],
@@ -1789,9 +1761,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            );
 	          }
 	        }, this);
-
+	        var disable = unselectable.indexOf(data[this.props.keyField]) !== -1;
 	        var selected = this.props.selectedRowKeys.indexOf(data[this.props.keyField]) !== -1;
-	        var selectRowColumn = isSelectRowDefined && !this.props.selectRow.hideSelectColumn ? this.renderSelectRowColumn(selected) : null;
+	        var selectRowColumn = isSelectRowDefined && !this.props.selectRow.hideSelectColumn ? this.renderSelectRowColumn(selected, inputType, disable) : null;
 	        // add by bluespring for className customize
 	        var trClassName = this.props.trClassName;
 	        if (isFun(this.props.trClassName)) {
@@ -1805,7 +1777,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            onRowClick: this.handleRowClick,
 	            onRowMouseOver: this.handleRowMouseOver,
 	            onRowMouseOut: this.handleRowMouseOut,
-	            onSelectRow: this.handleSelectRow },
+	            onSelectRow: this.handleSelectRow,
+	            unselectableRow: disable },
 	          selectRowColumn,
 	          tableColumns
 	        );
@@ -1870,22 +1843,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'renderSelectRowColumn',
-	    value: function renderSelectRowColumn(selected) {
-	      if (this.props.selectRow.mode === _Const2['default'].ROW_SELECT_SINGLE) {
-	        return _react2['default'].createElement(
-	          _TableColumn2['default'],
-	          { dataAlign: 'center' },
-	          _react2['default'].createElement('input', { type: 'radio', checked: selected,
-	            onChange: this.handleSelectRowColumChange })
-	        );
-	      } else {
-	        return _react2['default'].createElement(
-	          _TableColumn2['default'],
-	          { dataAlign: 'center' },
-	          _react2['default'].createElement('input', { type: 'checkbox', checked: selected,
-	            onChange: this.handleSelectRowColumChange })
-	        );
-	      }
+	    value: function renderSelectRowColumn(selected, inputType, disabled) {
+	      return _react2['default'].createElement(
+	        _TableColumn2['default'],
+	        { dataAlign: 'center' },
+	        _react2['default'].createElement('input', { type: inputType, checked: selected, disabled: disabled,
+	          onChange: this.handleSelectRowColumChange })
+	      );
 	    }
 	  }, {
 	    key: '_isSelectRowDefined',
@@ -1916,7 +1880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1937,7 +1901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -1959,10 +1923,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
 	        (function () {
 	          var rowIndex = e.currentTarget.rowIndex + 1;
-	          if (_this.props.selectRow) {
-	            if (_this.props.selectRow.clickToSelect) {
-	              _this.props.onSelectRow(rowIndex, !_this.props.isSelected, e);
-	            } else if (_this.props.selectRow.clickToSelectAndEditCell) {
+	          var _props = _this.props;
+	          var selectRow = _props.selectRow;
+	          var unselectableRow = _props.unselectableRow;
+	          var isSelected = _props.isSelected;
+	          var onSelectRow = _props.onSelectRow;
+
+	          if (selectRow) {
+	            if (selectRow.clickToSelect && !unselectableRow) {
+	              onSelectRow(rowIndex, !isSelected, e);
+	            } else if (selectRow.clickToSelectAndEditCell && !unselectableRow) {
 	              _this.clickNum++;
 	              /** if clickToSelectAndEditCell is enabled,
 	               *  there should be a delay to prevent a selection changed when
@@ -1970,7 +1940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              **/
 	              setTimeout(function () {
 	                if (_this.clickNum === 1) {
-	                  _this.props.onSelectRow(rowIndex, !_this.props.isSelected, e);
+	                  onSelectRow(rowIndex, !isSelected, e);
 	                }
 	                _this.clickNum = 0;
 	              }, 200);
@@ -2035,13 +2005,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	  onRowClick: _react.PropTypes.func,
 	  onSelectRow: _react.PropTypes.func,
 	  onRowMouseOut: _react.PropTypes.func,
-	  onRowMouseOver: _react.PropTypes.func
+	  onRowMouseOver: _react.PropTypes.func,
+	  unselectableRow: _react.PropTypes.bool
 	};
 	TableRow.defaultProps = {
 	  onRowClick: undefined
 	};
 	exports['default'] = TableRow;
 	module.exports = exports['default'];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
 
 /***/ },
 /* 10 */
@@ -2207,7 +2232,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _NotificationJs2 = _interopRequireDefault(_NotificationJs);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -2712,6 +2737,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _handle_toast_remove(toastId) {
 	      var _this4 = this;
 
+	      if (this.props.preventDuplicates) {
+	        this.state.previousMessage = "";
+	      }
 	      var operationName = "" + (this.props.newestOnTop ? "reduceRight" : "reduce");
 	      this.state.toasts[operationName](function (found, toast, index) {
 	        if (found || toast.toastId !== toastId) {
@@ -2762,8 +2790,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    warning: "warning"
 	  },
 	  id: "toast-container",
-	  toastMessageFactory: _react2.default.createFactory(_ToastMessage2.default),
-	  preventDuplicates: false,
+	  toastMessageFactory: _react2.default.createFactory(_ToastMessage2.default.animation),
+	  preventDuplicates: true,
 	  newestOnTop: true,
 	  onClick: function onClick() {}
 	};
@@ -3195,7 +3223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4219,7 +4247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4297,7 +4325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4821,7 +4849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Const2 = _interopRequireDefault(_Const);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4936,6 +4964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* eslint guard-for-in: 0 */
 	/* eslint no-console: 0 */
 	/* eslint eqeqeq: 0 */
+	/* eslint one-var: 0 */
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5419,7 +5448,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var filterVal = undefined;
 	        for (var key in filterObj) {
 	          var targetVal = row[key];
-	          if (targetVal === null) return false;
+	          if (targetVal === null || targetVal === undefined) {
+	            targetVal = '';
+	          }
 
 	          switch (filterObj[key].type) {
 	            case _Const2['default'].FILTER_TYPE.NUMBER:
@@ -5452,13 +5483,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	              }
 	          }
-
+	          var format = undefined,
+	              filterFormatted = undefined,
+	              formatExtraData = undefined;
 	          if (_this4.colInfos[key]) {
-	            var _colInfos$key = _this4.colInfos[key];
-	            var format = _colInfos$key.format;
-	            var filterFormatted = _colInfos$key.filterFormatted;
-	            var formatExtraData = _colInfos$key.formatExtraData;
-
+	            format = _this4.colInfos[key].format;
+	            filterFormatted = _this4.colInfos[key].filterFormatted;
+	            formatExtraData = _this4.colInfos[key].formatExtraData;
 	            if (filterFormatted && format) {
 	              targetVal = format(row[key], row, formatExtraData);
 	            }
@@ -5487,6 +5518,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	              }
 	            default:
 	              {
+	                if (filterObj[key].type === _Const2['default'].FILTER_TYPE.SELECT && filterFormatted && filterFormatted && format) {
+	                  filterVal = format(filterVal, row, formatExtraData);
+	                }
 	                valid = _this4.filterText(targetVal, filterVal);
 	                break;
 	              }
@@ -5520,11 +5554,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0, keysLength = keys.length; i < keysLength; i++) {
 	          var key = keys[i];
 	          if (_this5.colInfos[key] && row[key]) {
-	            var _colInfos$key2 = _this5.colInfos[key];
-	            var format = _colInfos$key2.format;
-	            var filterFormatted = _colInfos$key2.filterFormatted;
-	            var formatExtraData = _colInfos$key2.formatExtraData;
-	            var searchable = _colInfos$key2.searchable;
+	            var _colInfos$key = _this5.colInfos[key];
+	            var format = _colInfos$key.format;
+	            var filterFormatted = _colInfos$key.filterFormatted;
+	            var formatExtraData = _colInfos$key.formatExtraData;
+	            var searchable = _colInfos$key.searchable;
 
 	            var targetVal = _this5.getTextContent(row[key]);
 	            if (searchable) {
@@ -5624,7 +5658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Const2 = _interopRequireDefault(_Const);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -7422,7 +7456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -7760,7 +7794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -8251,7 +8285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -8354,7 +8388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -8410,7 +8444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -8473,7 +8507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -8841,7 +8875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9017,7 +9051,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9233,7 +9267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9305,7 +9339,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9572,7 +9606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9635,7 +9669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9686,7 +9720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -9992,7 +10026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -10238,7 +10272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -10502,7 +10536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Collapse2 = _interopRequireDefault(_Collapse);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -11040,7 +11074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _domHelpersEventsOn2 = _interopRequireDefault(_domHelpersEventsOn);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -11483,7 +11517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -15175,7 +15209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -15660,7 +15694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -15946,7 +15980,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16009,7 +16043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16159,7 +16193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16401,7 +16435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16453,7 +16487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16511,7 +16545,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ListGroupItem2 = _interopRequireDefault(_ListGroupItem);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16639,7 +16673,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16765,7 +16799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -16900,7 +16934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -17822,7 +17856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -17911,7 +17945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -17970,7 +18004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18064,7 +18098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18123,7 +18157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18174,7 +18208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18346,7 +18380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18589,7 +18623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18728,7 +18762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -18873,7 +18907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Fade2 = _interopRequireDefault(_Fade);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -19201,7 +19235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20062,7 +20096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20101,7 +20135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20184,7 +20218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20239,7 +20273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20497,7 +20531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20618,7 +20652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -20870,7 +20904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21002,7 +21036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21186,7 +21220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21281,7 +21315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21503,7 +21537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21661,7 +21695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21795,7 +21829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21861,7 +21895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -22303,7 +22337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -22385,7 +22419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -22496,7 +22530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -22653,12 +22687,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'render',
 	    value: function render() {
 	      var defaultCaret = undefined;
+	      var _props = this.props;
+	      var dataAlign = _props.dataAlign;
+	      var headerAlign = _props.headerAlign;
+	      var hidden = _props.hidden;
+	      var sort = _props.sort;
+	      var dataSort = _props.dataSort;
+	      var sortIndicator = _props.sortIndicator;
+	      var children = _props.children;
+	      var caretRender = _props.caretRender;
+
 	      var thStyle = {
-	        textAlign: this.props.dataAlign,
-	        display: this.props.hidden ? 'none' : null
+	        textAlign: headerAlign || dataAlign,
+	        display: hidden ? 'none' : null
 	      };
-	      if (this.props.sortIndicator) {
-	        defaultCaret = !this.props.dataSort ? null : _react2['default'].createElement(
+	      if (sortIndicator) {
+	        defaultCaret = !dataSort ? null : _react2['default'].createElement(
 	          'span',
 	          { className: 'order' },
 	          _react2['default'].createElement(
@@ -22673,13 +22717,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          )
 	        );
 	      }
-	      var sortCaret = this.props.sort ? _util2['default'].renderReactSortCaret(this.props.sort) : defaultCaret;
-	      if (this.props.caretRender) {
-	        sortCaret = this.props.caretRender(this.props.sort);
+	      var sortCaret = sort ? _util2['default'].renderReactSortCaret(sort) : defaultCaret;
+	      if (caretRender) {
+	        sortCaret = caretRender(sort);
 	      }
 
-	      var classes = this.props.className + ' ' + (this.props.dataSort ? 'sort-column' : '');
-	      var title = typeof this.props.children === 'string' ? { title: this.props.children } : null;
+	      var classes = this.props.className + ' ' + (dataSort ? 'sort-column' : '');
+	      var title = typeof children === 'string' ? { title: children } : null;
 	      return _react2['default'].createElement(
 	        'th',
 	        _extends({ ref: 'header-col',
@@ -22687,7 +22731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          style: thStyle,
 	          onClick: this.handleColumnClick
 	        }, title),
-	        this.props.children,
+	        children,
 	        sortCaret,
 	        _react2['default'].createElement(
 	          'div',
@@ -22711,6 +22755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	TableHeaderColumn.propTypes = {
 	  dataField: _react.PropTypes.string,
 	  dataAlign: _react.PropTypes.string,
+	  headerAlign: _react.PropTypes.string,
 	  dataSort: _react.PropTypes.bool,
 	  onSort: _react.PropTypes.func,
 	  dataFormat: _react.PropTypes.func,
@@ -22748,6 +22793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	TableHeaderColumn.defaultProps = {
 	  dataAlign: 'left',
+	  headerAlign: undefined,
 	  dataSort: false,
 	  dataFormat: undefined,
 	  csvFormat: undefined,
@@ -23161,7 +23207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -23274,7 +23320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(6);
+	var _classnames = __webpack_require__(9);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 

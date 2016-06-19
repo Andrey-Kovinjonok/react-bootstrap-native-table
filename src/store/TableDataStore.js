@@ -102,6 +102,30 @@ export class TableDataStore {
     else return this.data;
   }
 
+  getTextContent(element) {
+    let res = '';
+    const parseElement = (child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        res += child;
+      } else if (Array.isArray(child)) {
+        child.forEach(c => parseElement(c));
+      } else if (child && child.props) {
+        const { children } = child.props;
+
+        if (Array.isArray(children)) {
+          children.forEach(c => parseElement(c) );
+        } else {
+          parseElement(children);
+        }
+      }
+    };
+
+    parseElement(element);
+
+    return res;
+  }
+
+
   _refresh(skipSorting) {
     if (this.isOnFilter) {
       if (this.filterObj !== null) this.filter(this.filterObj);
@@ -487,7 +511,7 @@ export class TableDataStore {
         const key = keys[i];
         if (this.colInfos[key] && row[key]) {
           const { format, filterFormatted, formatExtraData, searchable } = this.colInfos[key];
-          let targetVal = row[key];
+          let targetVal = this.getTextContent(row[key]);
           if (searchable) {
             if (filterFormatted && format) {
               targetVal = format(targetVal, row, formatExtraData);
