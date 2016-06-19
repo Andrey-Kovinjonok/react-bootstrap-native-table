@@ -25,8 +25,9 @@ class TableHeader extends Component {
     let selectRowHeaderCol = null;
     if (!this.props.hideSelectColumn) selectRowHeaderCol = this.renderSelectRowHeader();
     let i = 0;
+
     return (
-      <thead ref='container' style={ this.props.style }>
+      <thead style={ this.props.style }>
         <tr ref='header'>
           { selectRowHeaderCol }
           {

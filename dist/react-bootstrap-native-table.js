@@ -477,7 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    this._scrollHeader = function (e) {
-	      _this.refs.header.refs.container.scrollLeft = e.currentTarget.scrollLeft;
+	      _this.refs.header.refs.tbody.scrollLeft = e.currentTarget.scrollLeft;
 	    };
 
 	    this._adjustTable = function () {
@@ -487,7 +487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this._adjustHeaderWidth = function () {
 	      var header = _this.refs.header.refs.header;
-	      var headerContainer = _this.refs.header.refs.container;
+	      var headerContainer = _this.refs.header.refs.tbody;
 	      var tbody = _this.refs.body.refs.tbody;
 	      var firstRow = tbody.childNodes[0];
 	      var isScroll = headerContainer.offsetWidth !== tbody.parentNode.offsetWidth;
@@ -519,7 +519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this._adjustHeight = function () {
 	      if (_this.props.height.indexOf('%') === -1) {
-	        _this.refs.body.refs.container.style.height = parseFloat(_this.props.height, 10) - _this.refs.header.refs.container.offsetHeight + 'px';
+	        _this.refs.body.refs.tbody.style.height = parseFloat(_this.props.height, 10) - _this.refs.header.refs.tbody.offsetHeight + 'px';
 	      }
 	    };
 
@@ -1425,9 +1425,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var selectRowHeaderCol = null;
 	      if (!this.props.hideSelectColumn) selectRowHeaderCol = this.renderSelectRowHeader();
 	      var i = 0;
+
 	      return _react2['default'].createElement(
 	        'thead',
-	        { ref: 'container', style: this.props.style },
+	        { style: this.props.style },
 	        _react2['default'].createElement(
 	          'tr',
 	          { ref: 'header' },

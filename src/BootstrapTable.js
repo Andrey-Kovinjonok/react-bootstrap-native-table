@@ -11,8 +11,8 @@ import { TableDataStore } from './store/TableDataStore';
 import Util from './util';
 import exportCSV from './csv_export_util';
 import { Filter } from './Filter';
-
 import * as RBS from 'react-bootstrap';
+
 const { Table } = RBS;
 
 class BootstrapTable extends Component {
