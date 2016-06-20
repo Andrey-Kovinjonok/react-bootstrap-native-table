@@ -2,7 +2,7 @@
 ### Features
 * rebase from origin branch 2.3.7
 * fix some types' warnings
-* fix body refs
+* fix table body refs
 
 <a name="v0.0.7"></a>
 ### Features
