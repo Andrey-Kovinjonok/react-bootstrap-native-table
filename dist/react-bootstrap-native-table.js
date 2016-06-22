@@ -23512,4 +23512,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=react-bootstrap-table.js.map
+//# sourceMappingURL=react-bootstrap-native-table.js.map
