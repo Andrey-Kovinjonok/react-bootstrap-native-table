@@ -29,7 +29,6 @@ class TableBody extends Component {
 
     const unselectable = this.props.selectRow.unselectable || [];
     const isSelectRowDefined = this._isSelectRowDefined();
-    const tableHeader = this.renderTableHeader(isSelectRowDefined);
     const inputType = this.props.selectRow.mode === Const.ROW_SELECT_SINGLE ? 'radio' : 'checkbox';
 
     const tableRows = this.props.data.map(function(data, r) {
@@ -137,7 +136,6 @@ class TableBody extends Component {
 
     return (
       <tbody ref='tbody' className={ tableClasses } style={ this.props.style }>
-        { tableHeader }
         { tableRows }
       </tbody>
     );

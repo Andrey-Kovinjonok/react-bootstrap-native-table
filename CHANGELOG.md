@@ -3,6 +3,7 @@
 * rebase from origin branch 2.3.7
 * fix some types' warnings
 * fix table body refs
+* set column's Width from TableHeaderColumn's width property
 
 <a name="v0.0.7"></a>
 ### Features

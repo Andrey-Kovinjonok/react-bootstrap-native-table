@@ -1,5 +1,6 @@
 /* eslint default-case: 0 */
 /* eslint guard-for-in: 0 */
+import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
 import Const from './Const';
 import Util from './util';
@@ -79,8 +80,10 @@ class TableHeaderColumn extends Component {
       dataSort,
       sortIndicator,
       children,
+      width,
       caretRender
     } = this.props;
+
     const thStyle = {
       textAlign: headerAlign || dataAlign,
       display: hidden ? 'none' : null
@@ -104,10 +107,21 @@ class TableHeaderColumn extends Component {
 
     const classes = this.props.className + ' ' + (dataSort ? 'sort-column' : '');
     const title = typeof children === 'string' ? { title: children } : null;
+
+    let columnWidth = _.isString(width) === true ? width : undefined;
+    if (!columnWidth) {
+      columnWidth = !!width ? parseInt(width, 10) : undefined;
+    }
+
+    const styleWithWidth = {
+      ...thStyle,
+      'width': columnWidth
+    };
+
     return (
       <th ref='header-col'
           className={ classes }
-          style={ thStyle }
+          style={ styleWithWidth }
           onClick={ this.handleColumnClick }
           { ...title }>
         { children }{ sortCaret }
