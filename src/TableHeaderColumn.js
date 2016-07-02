@@ -153,7 +153,7 @@ TableHeaderColumn.propTypes = {
   hiddenOnInsert: PropTypes.bool,
   searchable: PropTypes.bool,
   className: PropTypes.string,
-  width: PropTypes.string,
+  width: PropTypes.oneOf([ PropTypes.string, PropTypes.number ]),
   sortFunc: PropTypes.func,
   sortFuncExtraData: PropTypes.any,
   columnClassName: PropTypes.any,
