@@ -235,7 +235,7 @@ class TableBody extends Component {
         this.props.cellEdit.mode !== Const.CELL_EDIT_DBCLICK) {
       const selected = this.props.selectedRowKeys.indexOf(
         this.props.data[rowIndex][this.props.keyField]) !== -1;
-      this.handleSelectRow(rowIndex + 1, !selected, e);
+      this.handleSelectRow(rowIndex, !selected, e);
     }
     this.setState(stateObj);
   }

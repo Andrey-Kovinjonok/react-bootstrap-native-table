@@ -1,8 +1,10 @@
+<a name="v0.0.9"></a>
+* fix again table selected index
+
 <a name="v0.0.8"></a>
 ### Features
 * rebase from origin branch 2.3.7
 * fix some types' warnings
-* fix table body refs
 * set column's Width from TableHeaderColumn's width property
 
 <a name="v0.0.7"></a>

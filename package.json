@@ -1,6 +1,6 @@
 {
   "name": "react-bootstrap-native-table",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "It's a react table for bootstrap",
   "main": "./lib/index.js",
   "repository": {

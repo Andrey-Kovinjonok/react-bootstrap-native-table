@@ -477,7 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    this._scrollHeader = function (e) {
-	      _this.refs.header.refs.tbody.scrollLeft = e.currentTarget.scrollLeft;
+	      _this.refs.header.refs.container.scrollLeft = e.currentTarget.scrollLeft;
 	    };
 
 	    this._adjustTable = function () {
@@ -487,7 +487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this._adjustHeaderWidth = function () {
 	      var header = _this.refs.header.refs.header;
-	      var headerContainer = _this.refs.header.refs.tbody;
+	      var headerContainer = _this.refs.header.refs.container;
 	      var tbody = _this.refs.body.refs.tbody;
 	      var firstRow = tbody.childNodes[0];
 	      var isScroll = headerContainer.offsetWidth !== tbody.parentNode.offsetWidth;
@@ -519,7 +519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this._adjustHeight = function () {
 	      if (_this.props.height.indexOf('%') === -1) {
-	        _this.refs.body.refs.tbody.style.height = parseFloat(_this.props.height, 10) - _this.refs.header.refs.tbody.offsetHeight + 'px';
+	        _this.refs.body.refs.tbody.style.height = parseFloat(_this.props.height, 10) - _this.refs.header.refs.container.offsetHeight + 'px';
 	      }
 	    };
 
@@ -1668,7 +1668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (_this.props.selectRow.clickToSelectAndEditCell && _this.props.cellEdit.mode !== _Const2['default'].CELL_EDIT_DBCLICK) {
 	        var selected = _this.props.selectedRowKeys.indexOf(_this.props.data[rowIndex][_this.props.keyField]) !== -1;
-	        _this.handleSelectRow(rowIndex + 1, !selected, e);
+	        _this.handleSelectRow(rowIndex, !selected, e);
 	      }
 	      _this.setState(stateObj);
 	    };
@@ -1921,7 +1921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.rowClick = function (e) {
 	      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
 	        (function () {
-	          var rowIndex = e.currentTarget.rowIndex + 1;
+	          var rowIndex = e.currentTarget.rowIndex;
 	          var _props = _this.props;
 	          var selectRow = _props.selectRow;
 	          var unselectableRow = _props.unselectableRow;

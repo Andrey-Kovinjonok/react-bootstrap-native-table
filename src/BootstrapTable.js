@@ -11,8 +11,8 @@ import { TableDataStore } from './store/TableDataStore';
 import Util from './util';
 import exportCSV from './csv_export_util';
 import { Filter } from './Filter';
-import * as RBS from 'react-bootstrap';
 
+import * as RBS from 'react-bootstrap';
 const { Table } = RBS;
 
 class BootstrapTable extends Component {
@@ -833,7 +833,7 @@ class BootstrapTable extends Component {
   }
 
   _scrollHeader = (e) => {
-    this.refs.header.refs.tbody.scrollLeft = e.currentTarget.scrollLeft;
+    this.refs.header.refs.container.scrollLeft = e.currentTarget.scrollLeft;
   }
 
   _adjustTable = () => {
@@ -843,7 +843,7 @@ class BootstrapTable extends Component {
 
   _adjustHeaderWidth = () => {
     const header = this.refs.header.refs.header;
-    const headerContainer = this.refs.header.refs.tbody;
+    const headerContainer = this.refs.header.refs.container;
     const tbody = this.refs.body.refs.tbody;
     const firstRow = tbody.childNodes[0];
     const isScroll = headerContainer.offsetWidth !== tbody.parentNode.offsetWidth;
@@ -876,7 +876,7 @@ class BootstrapTable extends Component {
   _adjustHeight = () => {
     if (this.props.height.indexOf('%') === -1) {
       this.refs.body.refs.tbody.style.height =
-        parseFloat(this.props.height, 10) - this.refs.header.refs.tbody.offsetHeight + 'px';
+        parseFloat(this.props.height, 10) - this.refs.header.refs.container.offsetHeight + 'px';
     }
   }
 
